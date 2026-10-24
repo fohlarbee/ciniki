@@ -4,6 +4,7 @@ import ChatDemo from "@/components/landing/ChatDemo";
 import FeatureCard from "@/components/landing/FeatureCard";
 import Reveal from "@/components/landing/Reveal";
 import Icon, { type IconName } from "@/components/ui/Icon";
+import LaunchLink from "@/components/ui/LaunchLink";
 import "@/styles/landing.css";
 
 const name = process.env.NEXT_PUBLIC_APP_NAME || "Brine";
@@ -63,9 +64,7 @@ export default function Landing() {
               Swap, earn, borrow, stake and automate in plain English. {name} prepares every transaction, you review a clear ticket, and you sign in your own wallet.
             </p>
             <div className="hero-ctas">
-              <Link href="/app" className="btn btn-primary btn-lg">
-                Launch app <Icon name="arrowRight" />
-              </Link>
+              <LaunchLink className="btn btn-primary btn-lg">Launch app</LaunchLink>
               <a href="#how" className="btn btn-ghost btn-lg">
                 See how it works
               </a>
@@ -165,9 +164,7 @@ export default function Landing() {
               <span className="grad-text">You make the call.</span>
             </h2>
             <p>{name} is built so that nothing happens without your signature. The agent prepares, explains and checks. You decide.</p>
-            <Link href="/app" className="btn btn-secondary btn-lg">
-              Try it with a small amount <Icon name="arrowRight" />
-            </Link>
+            <LaunchLink className="btn btn-secondary btn-lg">Try it with a small amount</LaunchLink>
           </Reveal>
           <div className="sec-grid">
             {SECURITY.map((s, i) => (
@@ -213,9 +210,7 @@ export default function Landing() {
             <span className="cta-glow" aria-hidden="true" />
             <h2>Ready to do DeFi the easy way?</h2>
             <p>Connect Phantom or Solflare and make your first request in under a minute.</p>
-            <Link href="/app" className="btn btn-lg cta-btn">
-              Launch {name} <Icon name="arrowRight" />
-            </Link>
+            <LaunchLink className="btn btn-lg cta-btn">Launch {name}</LaunchLink>
           </Reveal>
         </div>
       </section>

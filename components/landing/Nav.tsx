@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import Icon from "../ui/Icon";
+import LaunchLink from "../ui/LaunchLink";
 
 const LINKS = [
   { href: "#features", label: "Features" },
@@ -37,9 +38,7 @@ export default function Nav({ name }: { name: string }) {
           ))}
         </nav>
         <div className="l-nav-end">
-          <Link href="/app" className="btn btn-primary btn-sm l-launch">
-            Launch app <Icon name="arrowRight" size={16} />
-          </Link>
+          <LaunchLink className="btn btn-primary btn-sm l-launch">Launch app</LaunchLink>
           <button className="btn btn-icon l-menu" aria-label={open ? "Close menu" : "Open menu"} aria-expanded={open} onClick={() => setOpen((o) => !o)}>
             <Icon name={open ? "x" : "menu"} />
           </button>
@@ -51,9 +50,7 @@ export default function Nav({ name }: { name: string }) {
             {l.label}
           </a>
         ))}
-        <Link href="/app" className="btn btn-primary btn-lg">
-          Launch app <Icon name="arrowRight" />
-        </Link>
+        <LaunchLink className="btn btn-primary btn-lg">Launch app</LaunchLink>
       </div>
     </header>
   );

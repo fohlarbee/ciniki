@@ -85,6 +85,7 @@ export default function Desk({ refreshKey, onAsk }: { refreshKey: number; onAsk:
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
   const [cancelling, setCancelling] = useState<string>();
+  const [ordersLoading, setOrdersLoading] = useState(false);
 
   const load = useCallback(async () => {
     if (!addr) return;
@@ -108,11 +109,14 @@ export default function Desk({ refreshKey, onAsk }: { refreshKey: number; onAsk:
   const loadOrders = useCallback(async () => {
     if (!addr) return;
     setErr("");
+    setOrdersLoading(true);
     try {
       const res = await fetchOrders(wallet as any, "active");
       setOrders(res.orders ?? []);
     } catch (e) {
       setErr(e instanceof Error ? e.message : "Could not load orders");
+    } finally {
+      setOrdersLoading(false);
     }
   }, [addr, wallet]);
 
@@ -376,8 +380,9 @@ export default function Desk({ refreshKey, onAsk }: { refreshKey: number; onAsk:
                 <Icon name="clock" size={20} />
               </span>
               <p>Recurring buys and price orders live in Jupiter escrow. Sign a login message to list them.</p>
-              <button className="btn btn-secondary btn-sm" onClick={loadOrders}>
-                <Icon name="key" size={15} /> Sign in and load orders
+              <button className="btn btn-secondary btn-sm" onClick={loadOrders} disabled={ordersLoading} aria-busy={ordersLoading}>
+                {ordersLoading ? <span className="btn-spinner" aria-hidden="true" /> : <Icon name="key" size={15} />}
+                {ordersLoading ? "Waiting for signature…" : "Sign in and load orders"}
               </button>
             </div>
           ) : orders.length === 0 ? (
@@ -408,7 +413,8 @@ export default function Desk({ refreshKey, onAsk }: { refreshKey: number; onAsk:
                 {String(o.orderType).includes("dca") ? (
                   <span className="badge">DCA</span>
                 ) : (
-                  <button className="btn btn-ghost btn-sm" disabled={cancelling === o.id} onClick={() => cancel(o.id)}>
+                  <button className="btn btn-ghost btn-sm" disabled={cancelling === o.id} aria-busy={cancelling === o.id} onClick={() => cancel(o.id)}>
+                    {cancelling === o.id && <span className="btn-spinner" aria-hidden="true" />}
                     {cancelling === o.id ? "Cancelling" : "Cancel"}
                   </button>
                 )}

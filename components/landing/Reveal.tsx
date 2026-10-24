@@ -1,29 +1,11 @@
-"use client";
-
-import { useEffect, useRef, useState } from "react";
-
-/** Fades and lifts its children in the first time they scroll into view. */
+/**
+ * Scroll reveal done in CSS (scroll-driven animations), so content is never
+ * hidden waiting for JavaScript. Browsers without support just show it.
+ */
 export default function Reveal({ children, delay = 0, as: Tag = "div", className = "" }: { children: React.ReactNode; delay?: number; as?: any; className?: string }) {
-  const ref = useRef<HTMLElement>(null);
-  const [shown, setShown] = useState(false);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    if (!("IntersectionObserver" in window)) return setShown(true);
-    const io = new IntersectionObserver(
-      ([e]) => {
-        if (e.isIntersecting) {
-          setShown(true);
-          io.disconnect();
-        }
-      },
-      { threshold: 0.15, rootMargin: "0px 0px -40px 0px" },
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
+  const start = Math.round(delay / 25);
   return (
-    <Tag ref={ref} className={`reveal${shown ? " in" : ""} ${className}`} style={{ transitionDelay: `${delay}ms` }}>
+    <Tag className={`reveal ${className}`} style={delay ? ({ "--reveal-start": `${start}%`, "--reveal-end": `${35 + start}%` } as React.CSSProperties) : undefined}>
       {children}
     </Tag>
   );

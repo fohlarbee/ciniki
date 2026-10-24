@@ -46,21 +46,30 @@ type Phase = "typing" | "sent" | "steps" | "reply" | "ticket" | "approved";
 
 export default function ChatDemo() {
   const [i, setI] = useState(0);
-  const [typed, setTyped] = useState("");
-  const [phase, setPhase] = useState<Phase>("typing");
-  const [stepN, setStepN] = useState(0);
+  // Server render shows a finished frame, so the window is never empty while JS loads.
+  const [typed, setTyped] = useState(SCRIPTS[0].prompt);
+  const [phase, setPhase] = useState<Phase>("ticket");
+  const [stepN, setStepN] = useState(SCRIPTS[0].steps.length);
   const [visible, setVisible] = useState(true);
-  const [still, setStill] = useState(false);
+  const [still, setStill] = useState(true);
   const ref = useRef<HTMLDivElement>(null);
   const s = SCRIPTS[i];
 
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setStill(true);
-      setTyped(SCRIPTS[0].prompt);
-      setStepN(SCRIPTS[0].steps.length);
-      setPhase("ticket");
+    // Start the animated loop once hydrated, unless the user prefers reduced motion.
+    if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      const t = setTimeout(() => {
+        setTyped("");
+        setStepN(0);
+        setPhase("typing");
+        setStill(false);
+      }, 1800);
+      return () => clearTimeout(t);
     }
+  }, []);
+
+  // Pause the loop while the demo is offscreen.
+  useEffect(() => {
     const el = ref.current;
     if (!el || !("IntersectionObserver" in window)) return;
     const io = new IntersectionObserver(([e]) => setVisible(e.isIntersecting), { threshold: 0.1 });

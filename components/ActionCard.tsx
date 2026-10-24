@@ -130,7 +130,12 @@ export default function ActionCard({ action, onResult }: Props) {
             </button>
           </>
         )}
-        {state === "busy" && <span className="status busy">{step || "Working"}…</span>}
+        {state === "busy" && (
+          <button className="btn btn-primary" disabled aria-busy="true">
+            <span className="btn-spinner" aria-hidden="true" />
+            {step || "Working"}…
+          </button>
+        )}
         {state === "done" && (
           <span className="status ok">
             <span className="ok-badge">

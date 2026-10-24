@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { useWallet } from "@solana/wallet-adapter-react";
 
 // Wallet state only exists in the browser, so render the button client-side
 // only to avoid a server/client hydration mismatch.
@@ -14,5 +15,10 @@ const WalletMultiButton = dynamic(
 );
 
 export default function WalletButton() {
-  return <WalletMultiButton />;
+  const { connecting } = useWallet();
+  return (
+    <span className={`wallet-btn${connecting ? " connecting" : ""}`} aria-busy={connecting}>
+      <WalletMultiButton />
+    </span>
+  );
 }
