@@ -1,7 +1,7 @@
 import type { SVGProps } from "react";
 
 const P: Record<string, React.ReactNode> = {
-  logo: <path d="M3 8c2.5-2.5 4.5-2.5 7 0s4.5 2.5 7 0 4-2 4 0M3 13c2.5-2.5 4.5-2.5 7 0s4.5 2.5 7 0 4-2 4 0M3 18c2.5-2.5 4.5-2.5 7 0s4.5 2.5 7 0 4-2 4 0" strokeWidth="2.4" />,
+  logo: <><path d="M3.5 6.5A1.5 1.5 0 0 1 5 5h14a1.5 1.5 0 0 1 1.5 1.5V10a2 2 0 0 0 0 4v3.5A1.5 1.5 0 0 1 19 19H5a1.5 1.5 0 0 1-1.5-1.5V14a2 2 0 0 0 0-4z" fill="currentColor" stroke="none" /><path d="M9 9.5v5M9 7v.01M9 17v.01" stroke="#fff" strokeWidth="1.6" /></>,
   send: <path d="M5 12h13M12 5l7 7-7 7" />,
   stop: <rect x="7" y="7" width="10" height="10" rx="2" fill="currentColor" stroke="none" />,
   copy: <><rect x="9" y="9" width="11" height="11" rx="2.5" /><path d="M5 15V6a2 2 0 0 1 2-2h9" /></>,

@@ -1,14 +1,13 @@
 "use client";
 
 import Link, { useLinkStatus } from "next/link";
-import Icon from "./Icon";
 
 function Content({ children }: { children: React.ReactNode }) {
   const { pending } = useLinkStatus();
   return (
     <>
+      {pending && <span className="btn-spinner" aria-hidden="true" />}
       {children}
-      {pending ? <span className="btn-spinner" aria-hidden="true" /> : <Icon name="arrowRight" />}
       {pending && <span className="sr-only">Loading</span>}
     </>
   );

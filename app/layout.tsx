@@ -1,21 +1,21 @@
 import type { Metadata, Viewport } from "next";
-import { JetBrains_Mono, Schibsted_Grotesk } from "next/font/google";
+import { Mona_Sans } from "next/font/google";
 import "./globals.css";
+import { APP_NAME } from "@/components/brand";
 
-const sans = Schibsted_Grotesk({ subsets: ["latin"], variable: "--font-schibsted", display: "swap" });
-const mono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-jetbrains", display: "swap" });
+const mona = Mona_Sans({ subsets: ["latin"], axes: ["wdth"], variable: "--font-mona", display: "swap" });
 
-const name = process.env.NEXT_PUBLIC_APP_NAME || "Brine";
+const name = APP_NAME;
 
 export const metadata: Metadata = {
   title: `${name} — DeFi on Solana, by conversation`,
   description: "Swap, earn, borrow, stake and automate on Solana by asking. You approve every transaction in your own wallet.",
 };
-export const viewport: Viewport = { themeColor: "#11152A", width: "device-width", initialScale: 1, viewportFit: "cover" };
+export const viewport: Viewport = { themeColor: "#F4F6F3", width: "device-width", initialScale: 1, viewportFit: "cover" };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${sans.variable} ${mono.variable}`}>
+    <html lang="en" className={mona.variable}>
       <body>{children}</body>
     </html>
   );

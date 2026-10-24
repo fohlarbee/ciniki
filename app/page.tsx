@@ -1,40 +1,21 @@
-import Link from "next/link";
 import Nav from "@/components/landing/Nav";
-import ChatDemo from "@/components/landing/ChatDemo";
-import FeatureCard from "@/components/landing/FeatureCard";
-import Reveal from "@/components/landing/Reveal";
-import Icon, { type IconName } from "@/components/ui/Icon";
+import HeroPrompt from "@/components/landing/HeroPrompt";
+import Ticket from "@/components/Ticket";
+import AskList from "@/components/landing/AskList";
+import TicketAnatomy from "@/components/landing/TicketAnatomy";
 import LaunchLink from "@/components/ui/LaunchLink";
+import { APP_NAME } from "@/components/brand";
 import "@/styles/landing.css";
 
-const name = process.env.NEXT_PUBLIC_APP_NAME || "Brine";
-
-const MARQUEE = ["Swaps", "Lending", "Borrowing", "Native staking", "Liquid staking", "Recurring buys", "Limit orders", "Take-profit", "Stop-loss", "Token risk scans", "Yield scanner", "Transfers"];
-const SOURCES = ["Jupiter", "DefiLlama", "DexScreener", "Solana mainnet"];
-
-const FEATURES: { icon: IconName; title: string; body: string; example: string }[] = [
-  { icon: "swap", title: "Trade", body: "Best-route swaps across Solana liquidity through Jupiter, with slippage and price impact shown before you sign.", example: "Swap 0.5 SOL to USDC" },
-  { icon: "earn", title: "Earn", body: "Scan yields across Solana, then deposit into Jupiter Lend in one step and withdraw whenever you like.", example: "Best stablecoin yields right now?" },
-  { icon: "borrow", title: "Borrow", body: "Open vaults, add collateral, borrow and repay. Your loan-to-value and liquidation limit stay in view.", example: "Show borrow markets and their limits" },
-  { icon: "stake", title: "Stake", body: "Native staking with validator selection, or liquid staking into JitoSOL and mSOL so your SOL keeps working.", example: "Stake 2 SOL with JitoSOL" },
-  { icon: "clock", title: "Automate", body: "Recurring buys, limit orders, take-profit, stop-loss and OCO pairs that run on-chain in Jupiter escrow.", example: "Buy $200 of SOL every week" },
-  { icon: "search", title: "Research", body: "Check any token before you buy: verification, mint and freeze authority, holder concentration, liquidity and risk flags.", example: "Is JUP safe to buy?" },
-];
-
-const SECURITY: { icon: IconName; title: string; body: string }[] = [
-  { icon: "key", title: "Your keys never leave your wallet", body: "The server never holds a private key. Every transaction is signed in Phantom or Solflare by you." },
-  { icon: "eye", title: "Simulated before you sign", body: "Transactions are simulated on-chain first, so you see a pass or a warning before you approve." },
-  { icon: "shield", title: "Look-alike tokens refused", body: "Symbols resolve to verified tokens only. Copycat tokens with familiar names are rejected." },
-  { icon: "clock", title: "Stale quotes expire", body: "Prepared swaps expire after about a minute, so you never sign against an outdated price." },
-];
+const name = APP_NAME;
 
 const FAQ = [
-  { q: `Does ${name} ever hold my funds?`, a: `No. ${name} prepares transactions and shows them to you as a ticket. You sign each one in your own wallet, and the server never sees your private key.` },
-  { q: "Which wallets are supported?", a: "Phantom and Solflare. Install either browser extension, open the app and connect." },
-  { q: "What can I ask it to do?", a: "Swap tokens, send tokens, lend and borrow on Jupiter Lend, stake SOL natively or through liquid staking, set recurring buys and price orders, and research token risk." },
-  { q: "What happens if I change my mind?", a: "Dismiss the ticket and nothing happens. Automated orders can be cancelled from the Orders tab, and escrowed funds are returned." },
-  { q: "Is this financial advice?", a: `No. ${name} explains options and prepares transactions, but every decision is yours. Start with small amounts.` },
-  { q: "Does it cost anything?", a: "Using the assistant is free within a daily message allowance. You pay normal Solana network fees on transactions you approve." },
+  { q: `Does ${name} ever hold my funds?`, a: `No. ${name} prepares transactions and shows them as tickets. You sign each one in your own wallet, and the server never sees your private key.` },
+  { q: "Which wallets work?", a: "Phantom and Solflare. Install either browser extension, open the app and connect." },
+  { q: "What if I change my mind?", a: "Dismiss the ticket and nothing is sent. Recurring buys and price orders can be cancelled from the Orders tab, and escrowed funds come back to you." },
+  { q: "Why do some tickets expire?", a: "Swap prices move. A quote is only good for about a minute, so an expired ticket asks you to request a fresh one instead of letting you sign an old price." },
+  { q: "Does it cost anything?", a: "Asking is free up to a daily message limit. Transactions you approve pay normal Solana network fees, plus any fee shown on the ticket." },
+  { q: "Is this financial advice?", a: `No. ${name} explains options and prepares transactions. Every decision is yours. Start with small amounts.` },
 ];
 
 export default function Landing() {
@@ -42,194 +23,131 @@ export default function Landing() {
     <div className="landing">
       <Nav name={name} />
 
-      {/* Hero */}
       <section className="hero">
-        <div className="hero-bg" aria-hidden="true">
-          <span className="orb o1" />
-          <span className="orb o2" />
-          <span className="orb o3" />
-          <span className="grid-bg" />
-        </div>
-        <div className="wrap hero-inner">
+        <div className="wrap hero-grid">
           <div className="hero-copy">
-            <span className="eyebrow">
-              <i /> AI agent for Solana DeFi
-            </span>
-            <h1>
-              DeFi on Solana,
-              <br />
-              <span className="grad-text">just by asking.</span>
+            <h1 className="hero-title">
+              <span>Say what you want.</span>
+              <span>Sign what you see.</span>
             </h1>
-            <p className="lede">
-              Swap, earn, borrow, stake and automate in plain English. {name} prepares every transaction, you review a clear ticket, and you sign in your own wallet.
+            <p className="hero-sub">
+              {name} is a chat for Solana DeFi. Ask for a swap, a stake or a recurring buy. It prepares the transaction as a ticket you can read, and nothing moves until you approve it in your own wallet.
             </p>
-            <div className="hero-ctas">
-              <LaunchLink className="btn btn-primary btn-lg">Launch app</LaunchLink>
-              <a href="#how" className="btn btn-ghost btn-lg">
-                See how it works
-              </a>
+            <HeroPrompt />
+            <p className="hero-note">Works with Phantom and Solflare. {name} never holds your keys.</p>
+          </div>
+
+          <div className="hero-demo" aria-label="Example ticket">
+            <p className="typed-ask">
+              <span>Swap 1 SOL to USDC</span>
+            </p>
+            <div className="slot" aria-hidden="true" />
+            <div className="slot-window">
+              <Ticket
+                kind="Swap"
+                title="1 SOL for about 101.6 USDC"
+                number="0412"
+                lines={[
+                  { k: "You pay", v: "1 SOL" },
+                  { k: "You receive", v: "≈ 101.6 USDC" },
+                  { k: "Route", v: "Jupiter" },
+                  { k: "Max slippage", v: "0.5%" },
+                ]}
+                checks={[
+                  { tone: "ok", text: "Simulation passed" },
+                  { tone: "ok", text: "USDC is a verified token" },
+                ]}
+                expiryLabel="0:58"
+                printing
+                className="hero-ticket"
+                footer={
+                  <>
+                    <span className="btn btn-signal btn-lg" aria-hidden="true">
+                      Approve in wallet
+                    </span>
+                    <span className="btn btn-ghost btn-lg" aria-hidden="true">
+                      Dismiss
+                    </span>
+                  </>
+                }
+              />
             </div>
-            <ul className="hero-trust">
-              <li>
-                <Icon name="lock" size={16} /> Non-custodial
-              </li>
-              <li>
-                <Icon name="shield" size={16} /> Simulated first
-              </li>
-              <li>
-                <Icon name="check" size={16} /> You approve every step
-              </li>
-            </ul>
-          </div>
-          <div className="hero-demo">
-            <ChatDemo />
+            <p className="demo-caption">Example ticket. Prices are live when you ask.</p>
           </div>
         </div>
       </section>
 
-      {/* Marquee */}
-      <section className="marquee" aria-label="Supported actions">
-        <div className="marquee-track">
-          {[...MARQUEE, ...MARQUEE].map((m, i) => (
-            <span key={i}>
-              <Icon name="sparkle" size={14} /> {m}
-            </span>
-          ))}
-        </div>
-      </section>
-
-      {/* How it works */}
-      <section className="section" id="how">
+      <section className="section" id="ask">
         <div className="wrap">
-          <Reveal className="section-head">
-            <span className="kicker">How it works</span>
-            <h2>
-              From idea to on-chain in <span className="grad-text">three steps</span>
-            </h2>
-            <p>No dashboards to learn and no forms to fill. Say what you want and stay in control of every transaction.</p>
-          </Reveal>
-          <ol className="steps-row">
-            {[
-              { icon: "chat" as IconName, t: "Ask", b: "Type what you want in your own words, like “swap half my SOL to USDC”." },
-              { icon: "eye" as IconName, t: "Review", b: "The agent finds the route, simulates it and shows a ticket with every number that matters." },
-              { icon: "wallet" as IconName, t: "Sign", b: "Approve in your wallet. Nothing moves until you do, and you can dismiss any ticket." },
-            ].map((s, i) => (
-              <Reveal as="li" key={s.t} delay={i * 120} className="step-card">
-                <span className="step-num">0{i + 1}</span>
-                <span className="step-ico">
-                  <Icon name={s.icon} size={22} />
-                </span>
-                <h3>{s.t}</h3>
-                <p>{s.b}</p>
-              </Reveal>
-            ))}
+          <div className="section-head">
+            <h2>Ask for it in plain words</h2>
+            <p>Trades, deposits, loans, staking, recurring buys and token checks. Pick a request to see the ticket it produces.</p>
+          </div>
+          <AskList />
+        </div>
+      </section>
+
+      <section className="section section-sheet" id="ticket">
+        <div className="wrap">
+          <div className="section-head">
+            <h2>Every ticket shows what you are signing</h2>
+            <p>The ticket is the whole point. Read it, and approve only if it matches what you asked for.</p>
+          </div>
+          <TicketAnatomy />
+        </div>
+      </section>
+
+      <section className="section" id="how">
+        <div className="wrap how">
+          <h2>How it works</h2>
+          <ol className="how-steps">
+            <li>
+              <h3>Ask</h3>
+              <p>Type what you want, the way you would say it.</p>
+            </li>
+            <li>
+              <h3>Read the ticket</h3>
+              <p>{name} finds the route, simulates it and lists every number that matters.</p>
+            </li>
+            <li>
+              <h3>Approve in your wallet</h3>
+              <p>Your wallet signs. Nothing moves until you approve, and you can dismiss any ticket.</p>
+            </li>
           </ol>
         </div>
       </section>
 
-      {/* Features */}
-      <section className="section" id="features">
-        <div className="wrap">
-          <Reveal className="section-head">
-            <span className="kicker">Everything in one conversation</span>
-            <h2>
-              The whole Solana DeFi stack, <span className="grad-text">one prompt away</span>
-            </h2>
-            <p>Six kinds of action, one place to ask for them, and a ticket you can read before anything is signed.</p>
-          </Reveal>
-          <div className="f-grid">
-            {FEATURES.map((f, i) => (
-              <Reveal key={f.title} delay={(i % 3) * 100}>
-                <FeatureCard {...f} />
-              </Reveal>
-            ))}
-          </div>
-          <Reveal className="sources">
-            <span>Live data from</span>
-            {SOURCES.map((s) => (
-              <b key={s}>{s}</b>
-            ))}
-          </Reveal>
-        </div>
-      </section>
-
-      {/* Security */}
-      <section className="section security" id="security">
-        <div className="wrap sec-inner">
-          <Reveal className="sec-copy">
-            <span className="kicker">Security first</span>
-            <h2>
-              You hold the keys.
-              <br />
-              <span className="grad-text">You make the call.</span>
-            </h2>
-            <p>{name} is built so that nothing happens without your signature. The agent prepares, explains and checks. You decide.</p>
-            <LaunchLink className="btn btn-secondary btn-lg">Try it with a small amount</LaunchLink>
-          </Reveal>
-          <div className="sec-grid">
-            {SECURITY.map((s, i) => (
-              <Reveal key={s.title} delay={i * 90} className="sec-card">
-                <span className="sec-ico">
-                  <Icon name={s.icon} size={20} />
-                </span>
-                <h3>{s.title}</h3>
-                <p>{s.body}</p>
-              </Reveal>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* FAQ */}
       <section className="section" id="faq">
         <div className="wrap faq-wrap">
-          <Reveal className="section-head">
-            <span className="kicker">FAQ</span>
-            <h2>Questions, answered</h2>
-          </Reveal>
+          <h2>Questions</h2>
           <div className="faq">
-            {FAQ.map((f, i) => (
-              <Reveal key={f.q} delay={i * 60}>
-                <details>
-                  <summary>
-                    {f.q}
-                    <Icon name="chevron" size={18} />
-                  </summary>
-                  <p>{f.a}</p>
-                </details>
-              </Reveal>
+            {FAQ.map((f) => (
+              <details key={f.q}>
+                <summary>{f.q}</summary>
+                <p>{f.a}</p>
+              </details>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="section">
-        <div className="wrap">
-          <Reveal className="cta">
-            <span className="cta-glow" aria-hidden="true" />
-            <h2>Ready to do DeFi the easy way?</h2>
-            <p>Connect Phantom or Solflare and make your first request in under a minute.</p>
-            <LaunchLink className="btn btn-lg cta-btn">Launch {name}</LaunchLink>
-          </Reveal>
         </div>
       </section>
 
       <footer className="l-foot">
-        <div className="wrap foot-inner">
-          <Link href="/" className="logo">
-            <span className="logo-mark">
-              <Icon name="logo" />
-            </span>
-            {name}
-          </Link>
-          <p>Not financial advice. DeFi carries risk, including loss of funds. Review every transaction before you sign.</p>
-          <nav aria-label="Footer">
-            <a href="#features">Features</a>
-            <a href="#security">Security</a>
-            <a href="#faq">FAQ</a>
-            <Link href="/app">App</Link>
-          </nav>
+        <div className="wrap">
+          <div className="foot-cta">
+            <h2>Start with a small trade.</h2>
+            <LaunchLink className="btn btn-primary btn-lg">Open {name}</LaunchLink>
+          </div>
+          <div className="foot-meta">
+            <p>
+              {name} is Hausa for trade. Prices and routes come from Jupiter, yields from DefiLlama and token data from DexScreener. Not financial advice. DeFi carries risk, including loss of funds.
+            </p>
+            <nav aria-label="Footer">
+              <a href="#ask">What you can ask</a>
+              <a href="#ticket">Security</a>
+              <a href="#faq">FAQ</a>
+              <a href="https://github.com/fohlarbee/solanon">GitHub</a>
+            </nav>
+          </div>
         </div>
       </footer>
     </div>

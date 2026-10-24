@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Ticket, { ticketNumber, type TicketCheck } from "./Ticket";
 import { useWallet } from "@solana/wallet-adapter-react";
 import type { PendingAction } from "@/lib/types";
 import { executeAction } from "@/lib/client-exec";
@@ -32,11 +33,12 @@ export default function ActionCard({ action, onResult }: Props) {
   // Transactions built ahead of time carry a recent blockhash that goes stale after about a minute.
   const expires = action.exec.mode === "send" || action.exec.mode === "jup-swap";
   const [expired, setExpired] = useState(false);
+  const [expiresAt] = useState(() => (expires ? Date.now() + 70_000 : undefined));
   useEffect(() => {
-    if (!expires || state !== "idle") return;
-    const t = setTimeout(() => setExpired(true), 70_000);
+    if (!expiresAt || state !== "idle") return;
+    const t = setTimeout(() => setExpired(true), Math.max(0, expiresAt - Date.now()));
     return () => clearTimeout(t);
-  }, [expires, state]);
+  }, [expiresAt, state]);
 
   async function approve() {
     setState("busy");
@@ -63,107 +65,86 @@ export default function ActionCard({ action, onResult }: Props) {
 
   const stage = state === "done" ? 3 : state === "busy" ? stageOf(step) : -1;
 
-  return (
-    <div className={`ticket ${state}`}>
-      <div className="ticket-head">
-        <div className="ticket-head-top">
-          <span className="ticket-kind">{action.kind}</span>
-          {action.simulation?.ok && state === "idle" && !expired && (
-            <span className="sim ok">
-              <Icon name="shield" size={13} /> Simulation passed
-            </span>
-          )}
-        </div>
-        <h3>{action.title}</h3>
-      </div>
-      <div className="perf" />
-      <dl className="ticket-body">
-        {action.lines.map((l, i) => (
-          <div key={i}>
-            <dt>{l.k}</dt>
-            <dd className="mono">{l.v}</dd>
-          </div>
-        ))}
-      </dl>
-      {(action.warnings?.length || simFailed) && (
-        <ul className="ticket-warn">
-          {simFailed && (
-            <li>
-              <Icon name="alert" size={14} /> Simulation failed: {action.simulation?.error}. It may still work, but check before approving.
-            </li>
-          )}
-          {action.warnings?.map((w, i) => (
-            <li key={i}>
-              <Icon name="alert" size={14} /> {w}
-            </li>
-          ))}
-        </ul>
-      )}
+  const checks: TicketCheck[] = [];
+  if (action.simulation?.ok) checks.push({ tone: "ok", text: "Simulation passed" });
+  if (simFailed) checks.push({ tone: "bad", text: `Simulation failed: ${action.simulation?.error}. It may still work, so check before approving.` });
+  for (const w of action.warnings ?? []) checks.push({ tone: "warn", text: w });
+
+  const footer = (
+    <>
       {(state === "busy" || state === "done") && (
         <ol className="stages" aria-label="Progress">
           {STAGES.map((label, i) => (
             <li key={label} className={i < stage ? "done" : i === stage ? "active" : ""}>
-              <span className="stage-dot">{i < stage ? <Icon name="check" size={11} strokeWidth={3} /> : i === stage ? <span className="step-spinner" /> : null}</span>
+              <span className="stage-dot">{i < stage ? <Icon name="check" size={11} strokeWidth={3} /> : i === stage ? <span className="btn-spinner" /> : null}</span>
               {label}
             </li>
           ))}
         </ol>
       )}
-      <div className="ticket-foot">
-        {state === "idle" && expired && (
-          <>
-            <span className="status muted">
-              <Icon name="clock" size={14} /> This quote expired. Ask again to get a fresh one.
-            </span>
-            <button className="btn btn-ghost btn-sm" onClick={dismiss}>
-              Dismiss
-            </button>
-          </>
-        )}
-        {state === "idle" && !expired && (
-          <>
-            <button className="btn btn-primary" onClick={approve} disabled={!wallet.connected}>
-              <Icon name="wallet" size={17} /> Approve in wallet
-            </button>
-            <button className="btn btn-ghost" onClick={dismiss}>
-              Dismiss
-            </button>
-          </>
-        )}
-        {state === "busy" && (
-          <button className="btn btn-primary" disabled aria-busy="true">
-            <span className="btn-spinner" aria-hidden="true" />
-            {step || "Working"}…
+      {state === "idle" && expired && (
+        <>
+          <span className="status muted">Ask again for a fresh quote.</span>
+          <button className="btn btn-ghost btn-sm" onClick={dismiss}>
+            Dismiss
           </button>
-        )}
-        {state === "done" && (
-          <span className="status ok">
-            <span className="ok-badge">
-              <Icon name="check" size={13} strokeWidth={3} />
-            </span>
-            Confirmed
-            {sig && (
-              <a href={`https://solscan.io/tx/${sig}`} target="_blank" rel="noreferrer">
-                View on Solscan <Icon name="external" size={13} />
-              </a>
-            )}
-            {orderId && !sig && <span className="mono"> · order {orderId.slice(0, 8)}</span>}
+        </>
+      )}
+      {state === "idle" && !expired && (
+        <>
+          <button className="btn btn-signal btn-lg" onClick={approve} disabled={!wallet.connected}>
+            Approve in wallet
+          </button>
+          <button className="btn btn-ghost btn-lg" onClick={dismiss}>
+            Dismiss
+          </button>
+        </>
+      )}
+      {state === "busy" && (
+        <button className="btn btn-signal btn-lg" disabled aria-busy="true">
+          <span className="btn-spinner" aria-hidden="true" />
+          {step || "Working"}…
+        </button>
+      )}
+      {state === "done" && (
+        <span className="status ok">
+          <Icon name="check" size={16} strokeWidth={2.6} />
+          Approved and confirmed.
+          {sig && (
+            <a href={`https://solscan.io/tx/${sig}`} target="_blank" rel="noreferrer">
+              View on Solscan
+            </a>
+          )}
+          {orderId && !sig && <span> Order {orderId.slice(0, 8)}</span>}
+        </span>
+      )}
+      {state === "rejected" && <span className="status muted">{error || "Dismissed. Nothing was sent."}</span>}
+      {state === "failed" && (
+        <>
+          <span className="status bad">
+            <Icon name="alert" size={15} /> {error}
           </span>
-        )}
-        {state === "rejected" && <span className="status muted">{error || "Dismissed"}</span>}
-        {state === "failed" && (
-          <>
-            <span className="status bad">
-              <Icon name="alert" size={14} /> {error}
-            </span>
-            {!expires && (
-              <button className="btn btn-ghost btn-sm" onClick={approve}>
-                <Icon name="retry" size={14} /> Try again
-              </button>
-            )}
-          </>
-        )}
-      </div>
-    </div>
+          {!expires && (
+            <button className="btn btn-ghost btn-sm" onClick={approve}>
+              Try again
+            </button>
+          )}
+        </>
+      )}
+    </>
+  );
+
+  return (
+    <Ticket
+      kind={action.kind.charAt(0).toUpperCase() + action.kind.slice(1)}
+      title={action.title}
+      number={ticketNumber(action.id)}
+      lines={action.lines}
+      checks={checks}
+      expiresAt={state === "idle" && !expired ? expiresAt : undefined}
+      printing
+      className={`state-${state}`}
+      footer={footer}
+    />
   );
 }

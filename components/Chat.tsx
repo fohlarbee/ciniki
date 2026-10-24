@@ -8,6 +8,7 @@ import type { ChatEvent, HistoryMsg, PendingAction } from "@/lib/types";
 import ActionCard from "./ActionCard";
 import Md from "./Md";
 import Icon, { type IconName } from "./ui/Icon";
+import { APP_NAME } from "./brand";
 
 type ToolEv = { name: string; label: string; status: "running" | "done" | "error" };
 type Msg = { id: string; role: "user" | "assistant"; text: string; tools: ToolEv[]; actions: PendingAction[]; hidden?: boolean; error?: boolean };
@@ -194,17 +195,17 @@ export default function Chat({ onChanged, pendingAsk, clearAsk }: { onChanged: (
       <section className="chat">
         <div className="welcome">
           <div className="welcome-card">
-            <span className="welcome-orb" aria-hidden="true">
-              <Icon name="sparkle" size={28} />
-            </span>
-            <h1>Connect your wallet to start</h1>
-            <p>Ask for a swap, a yield, a stake or an automation. Every transaction is prepared for you to review and signed in your own wallet.</p>
+            <h1>Connect a wallet to start</h1>
+            {pendingAsk ? (
+              <>
+                <p>Your request is ready. It sends as soon as your wallet connects.</p>
+                <p className="queued">“{pendingAsk}”</p>
+              </>
+            ) : (
+              <p>{APP_NAME} reads your balances to prepare tickets. You still approve every transaction in your wallet.</p>
+            )}
             <WalletButton />
-            <ul className="welcome-points">
-              <li><Icon name="lock" size={16} /> Non-custodial</li>
-              <li><Icon name="shield" size={16} /> Simulated before you sign</li>
-              <li><Icon name="check" size={16} /> You approve everything</li>
-            </ul>
+            <p className="welcome-fine">Phantom and Solflare are supported. {APP_NAME} never holds your keys.</p>
           </div>
         </div>
       </section>
@@ -220,26 +221,24 @@ export default function Chat({ onChanged, pendingAsk, clearAsk }: { onChanged: (
         <div className="thread">
           {visible.length === 0 ? (
             <div className="starters">
-              <span className="starters-orb" aria-hidden="true">
-                <Icon name="sparkle" size={22} />
-              </span>
               <h2>What do you want to do?</h2>
-              <p>Pick a prompt or type your own. Nothing moves until you approve it in your wallet.</p>
-              <div className="starter-grid">
-                {STARTERS.map((s, gi) => (
-                  <div key={s.group} className="starter-group" style={{ animationDelay: `${gi * 70}ms` }}>
+              <p>Pick a request or type your own. You will see a ticket before anything is sent.</p>
+              <div className="starter-groups">
+                {STARTERS.map((s) => (
+                  <div key={s.group} className="starter-group">
                     <h3>
-                      <span className="starter-icon">
-                        <Icon name={s.icon} size={16} />
-                      </span>
+                      <Icon name={s.icon} size={16} />
                       {s.group}
                     </h3>
-                    {s.items.map((t) => (
-                      <button key={t} onClick={() => send(t)} disabled={busy}>
-                        <span>{t}</span>
-                        <Icon name="arrowRight" size={15} />
-                      </button>
-                    ))}
+                    <ul>
+                      {s.items.map((t) => (
+                        <li key={t}>
+                          <button onClick={() => send(t)} disabled={busy}>
+                            {t}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 ))}
               </div>
@@ -251,8 +250,8 @@ export default function Chat({ onChanged, pendingAsk, clearAsk }: { onChanged: (
               return (
                 <div key={m.id} className={`row-msg ${m.role}`}>
                   {m.role === "assistant" && (
-                    <span className="avatar" aria-hidden="true">
-                      <Icon name="logo" size={16} />
+                    <span className="reply-mark" aria-hidden="true">
+                      <Icon name="logo" size={18} />
                     </span>
                   )}
                   <article className={`bubble ${m.role}${m.error ? " error" : ""}`}>
@@ -264,7 +263,7 @@ export default function Chat({ onChanged, pendingAsk, clearAsk }: { onChanged: (
                               {t.status === "running" ? <span className="step-spinner" /> : <Icon name={t.status === "error" ? "x" : "check"} size={12} strokeWidth={2.6} />}
                             </span>
                             {t.label}
-                            {t.status === "error" ? " failed" : ""}
+                            {t.status === "error" ? " (failed)" : ""}
                           </li>
                         ))}
                       </ul>
@@ -337,7 +336,7 @@ export default function Chat({ onChanged, pendingAsk, clearAsk }: { onChanged: (
                 e.currentTarget.form?.requestSubmit();
               }
             }}
-            placeholder="Swap 1 SOL to USDC, find the best yield, set a stop loss…"
+            placeholder="Ask for a swap, a stake or a yield…"
             rows={1}
             aria-label="Message"
           />
@@ -354,7 +353,7 @@ export default function Chat({ onChanged, pendingAsk, clearAsk }: { onChanged: (
         <div className="fine">
           <span>Not financial advice. Review every transaction.</span>
           <span className="fine-end">
-            <kbd>Enter</kbd> to send · <kbd>Shift</kbd>+<kbd>Enter</kbd> new line
+            <kbd>Enter</kbd> to send, <kbd>Shift</kbd>+<kbd>Enter</kbd> for a new line
             {remaining !== null && <span className="quota">{remaining} left today</span>}
           </span>
         </div>

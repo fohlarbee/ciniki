@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { cachedJwt, executeAction, fetchOrders } from "@/lib/client-exec";
 import Icon, { type IconName } from "./ui/Icon";
@@ -12,7 +12,8 @@ const money = (n?: number) => (n === undefined ? "–" : n.toLocaleString("en-US
 const num = (n: number) => n.toLocaleString("en-US", { maximumFractionDigits: n < 1 ? 6 : 4 });
 const short = (a: string) => `${a.slice(0, 4)}…${a.slice(-4)}`;
 
-const ALLOC = ["#8b5cf6", "#2ee6a8", "#5b8cff", "#f472b6", "#ffc56b", "#22d3ee"];
+// Muted ink and sea tones, not a rainbow.
+const ALLOC = ["#13212b", "#0a7a4b", "#5c9a7d", "#8a9aa4", "#b7c7bf", "#d3dbd6"];
 const QUICK: { label: string; icon: IconName; prompt: string }[] = [
   { label: "Swap", icon: "swap", prompt: "I want to swap tokens. What can I swap from my wallet?" },
   { label: "Stake", icon: "stake", prompt: "What are my best options to stake SOL?" },
@@ -20,38 +21,11 @@ const QUICK: { label: string; icon: IconName; prompt: string }[] = [
   { label: "Send", icon: "send2", prompt: "I want to send tokens to another wallet." },
 ];
 
-/** Animates a number toward its target so balance changes feel alive. */
-function useCountUp(target: number | undefined, ms = 700) {
-  const [v, setV] = useState(target ?? 0);
-  const from = useRef(0);
-  useEffect(() => {
-    if (target === undefined) return;
-    if (typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setV(target);
-      from.current = target;
-      return;
-    }
-    const start = performance.now();
-    const a = from.current;
-    let raf = 0;
-    const tick = (t: number) => {
-      const k = Math.min(1, (t - start) / ms);
-      const e = 1 - Math.pow(1 - k, 3);
-      setV(a + (target - a) * e);
-      if (k < 1) raf = requestAnimationFrame(tick);
-      else from.current = target;
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [target, ms]);
-  return v;
-}
-
 function TokenIcon({ src, symbol, i }: { src?: string; symbol: string; i: number }) {
   const [bad, setBad] = useState(false);
   if (src && !bad) return <img className="tok-icon" src={src} alt="" width={36} height={36} onError={() => setBad(true)} />;
   return (
-    <span className="tok-icon tok-fallback" style={{ background: `linear-gradient(135deg, ${ALLOC[i % ALLOC.length]}, ${ALLOC[(i + 1) % ALLOC.length]})` }}>
+    <span className="tok-icon tok-fallback" style={{ background: ALLOC[i % ALLOC.length] }}>
       {symbol.replace(/[^A-Za-z0-9]/g, "").slice(0, 2).toUpperCase() || "?"}
     </span>
   );
@@ -145,7 +119,7 @@ export default function Desk({ refreshKey, onAsk }: { refreshKey: number; onAsk:
     }
   }
 
-  const total = useCountUp(portfolio?.totalUsd);
+  const total = portfolio?.totalUsd ?? 0;
   const [copiedAddr, setCopiedAddr] = useState(false);
 
   if (!addr && status === "restoring") {
@@ -299,10 +273,10 @@ export default function Desk({ refreshKey, onAsk }: { refreshKey: number; onAsk:
                 <Icon name="earn" size={16} />
               </span>
               <span className="row-main">
-                <b>Earn · {p.symbol}</b>
+                <b>Earning on {p.symbol}</b>
                 <small>
                   {p.protocol}
-                  {p.apyPct !== undefined && <span className="apy"> · {p.apyPct.toFixed(2)}% APY</span>}
+                  {p.apyPct !== undefined && <span className="apy">, {p.apyPct.toFixed(2)}% APY</span>}
                 </small>
               </span>
               <span className="row-end">
@@ -322,9 +296,9 @@ export default function Desk({ refreshKey, onAsk }: { refreshKey: number; onAsk:
                     <Icon name="borrow" size={16} />
                   </span>
                   <span className="row-main">
-                    <b>Borrow · vault #{p.vaultId}</b>
+                    <b>Loan in vault {p.vaultId}</b>
                     <small>
-                      {p.collateral} → {p.debt}
+                      {p.collateral} backing {p.debt}
                     </small>
                   </span>
                   <span className={`row-end ltv ${level}`}>
@@ -348,7 +322,7 @@ export default function Desk({ refreshKey, onAsk }: { refreshKey: number; onAsk:
               <span className="row-main">
                 <b className="mono">{s.sol.toFixed(3)} SOL staked</b>
                 <small>
-                  <span className={`dot ${s.status}`} /> {s.status} · <span className="mono">{short(s.address)}</span>
+                  <span className={`dot ${s.status}`} /> {s.status}, <span className="mono">{short(s.address)}</span>
                 </small>
               </span>
               {s.status === "inactive" || s.status === "active" ? (
@@ -405,9 +379,9 @@ export default function Desk({ refreshKey, onAsk }: { refreshKey: number; onAsk:
                   <b style={{ textTransform: "capitalize" }}>{String(o.orderType).replace(/_/g, " ")}</b>
                   <small>
                     <span className="mono">
-                      {short(o.inputMint)} → {short(o.outputMint)}
+                      {short(o.inputMint)} to {short(o.outputMint)}
                     </span>
-                    {o.triggerPriceUsd ? ` · @ ${money(o.triggerPriceUsd)}` : ""} · {o.orderState}
+                    {o.triggerPriceUsd ? ` at ${money(o.triggerPriceUsd)}` : ""}, {o.orderState}
                   </small>
                 </span>
                 {String(o.orderType).includes("dca") ? (

@@ -1,10 +1,10 @@
-# Brine: DeFi on Solana, by conversation
+# Ciniki: DeFi on Solana, by conversation
 
-Brine is a chat app for Solana DeFi. You type what you want in plain English, like *"swap 1 SOL to USDC"* or *"stake 2 SOL"*. An AI agent prepares the transaction and shows it to you as a ticket you can review. You then approve it in your own wallet.
+Ciniki (said *chi-ni-ki*, Hausa for "trade") is a chat app for Solana DeFi. You type what you want in plain English, like *"swap 1 SOL to USDC"* or *"stake 2 SOL"*. An AI agent prepares the transaction and shows it to you as a ticket you can review. You then approve it in your own wallet.
 
-**Brine never holds your funds or your keys.** Every transaction is signed by you in Phantom or Solflare, and nothing happens until you approve it.
+**Ciniki never holds your funds or your keys.** Every transaction is signed by you in Phantom or Solflare, and nothing happens until you approve it.
 
-> ⚠️ Brine runs on Solana **mainnet**. Approved transactions move real funds. Start with small amounts. This is not financial advice.
+> ⚠️ Ciniki runs on Solana **mainnet**. Approved transactions move real funds. Start with small amounts. This is not financial advice.
 
 ---
 
@@ -77,7 +77,7 @@ All configuration lives in `.env.local`. That file is ignored by git, so your ke
 | `JUPITER_API_KEY` | Yes | Swaps, lending, borrowing, recurring buys and price orders. |
 | `SOLANA_RPC_URL` | Recommended | Your mainnet RPC endpoint. |
 | `DAILY_FREE_MESSAGES` | No | AI messages per wallet per day. Defaults to 25. |
-| `NEXT_PUBLIC_APP_NAME` | No | The name shown in the UI. Defaults to "Brine". |
+| `NEXT_PUBLIC_APP_NAME` | No | The name shown in the UI. Defaults to "Ciniki". |
 
 ---
 
@@ -115,6 +115,8 @@ components/
   Desk.tsx            Wallet panel: balance, tokens, positions, orders
   ActionCard.tsx      Transaction confirmation ticket
   landing/            Landing page sections
+  Ticket.tsx          The transaction ticket, shared by the landing page and chat
+  brand.ts            Product name
   ui/Icon.tsx         Inline SVG icons
 lib/
   agent.ts            AI agent loop and system prompt
@@ -125,7 +127,7 @@ lib/
 styles/               Page-specific CSS (app and landing)
 ```
 
-**Tech stack:** Next.js 15, React 19, TypeScript, the Anthropic SDK, Solana web3.js with wallet-adapter, the Jupiter APIs and zod. Styling is plain CSS with no UI framework.
+**Tech stack:** Next.js 15, React 19, TypeScript, the Anthropic SDK, Solana web3.js with wallet-adapter, the Jupiter APIs and zod. Styling is plain CSS with no UI framework, set in Mona Sans.
 
 ### Scripts
 
