@@ -51,8 +51,8 @@ The public Solana RPC works for a quick try, but it is heavily rate limited and 
 ### 3. Install and run
 
 ```bash
-git clone https://github.com/fohlarbee/solanon.git
-cd solanon
+git clone https://github.com/fohlarbee/ciniki.git
+cd ciniki
 npm install
 cp .env.example .env.local   # then open .env.local and paste your keys
 npm run dev

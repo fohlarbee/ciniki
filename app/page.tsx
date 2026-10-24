@@ -145,7 +145,7 @@ export default function Landing() {
               <a href="#ask">What you can ask</a>
               <a href="#ticket">Security</a>
               <a href="#faq">FAQ</a>
-              <a href="https://github.com/fohlarbee/solanon">GitHub</a>
+              <a href="https://github.com/fohlarbee/ciniki">GitHub</a>
             </nav>
           </div>
         </div>
